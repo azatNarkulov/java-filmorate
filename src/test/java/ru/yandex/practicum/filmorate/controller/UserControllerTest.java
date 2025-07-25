@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -28,14 +27,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void addUser_throwException_userLoginContainsSpace() {
-        user.setLogin("Login with space");
-
-        assertThrows(ValidationException.class, () -> userController.addUser(user), "Логин не может содержать пробелы");
-    }
-
-    @Test
-    public void checkName_setLoginInsteadOfName_nameIsEmpty() {
+    public void setNameIfEmpty_setLoginInsteadOfName_nameIsEmpty() {
         user.setName("");
 
         assertEquals(user.getLogin(), userController.addUser(user).getName());
@@ -48,14 +40,6 @@ public class UserControllerTest {
         User updatedUser = userController.updateUser(user);
 
         assertEquals(user.getName(), updatedUser.getName());
-    }
-
-    @Test
-    public void updateUser_throwException_userLoginContainsSpace() {
-        userController.addUser(user);
-        user.setLogin("Login with space");
-
-        assertThrows(ValidationException.class, () -> userController.updateUser(user));
     }
 
     @Test

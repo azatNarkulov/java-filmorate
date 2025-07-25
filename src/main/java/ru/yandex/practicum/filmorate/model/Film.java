@@ -3,28 +3,25 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import ru.yandex.practicum.filmorate.annotation.ValidReleaseDate;
 
 import java.time.LocalDate;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
 public class Film {
-    long id;
+    private Long id;
 
     @NotBlank(message = "Название фильма не может быть пустым")
-    String name;
+    private String name;
 
     @Size(max = 200, message = "Максимальная длина описания – 200 символов")
-    String description;
+    private String description;
 
-    @NotNull(message = "Дата релиза не может быть пустой")
-    @Past(message = "Дата релиза должна быть в прошлом")
-    LocalDate releaseDate;
+    @ValidReleaseDate
+    private LocalDate releaseDate;
 
     @NotNull(message = "Продолжительность фильма не может быть пустой")
     @Positive(message = "Продолжительность фильма может быть только положительным числом")
-    /*изначально у меня было Duration, но тесты не проходили, поменял на int – всё прошло
-    не подскажете, это норм? Или нужно поменять на Duration?
-    с Duration как будто код будет выглядеть сложнее*/
-    int duration;
+    private int duration;
 }
