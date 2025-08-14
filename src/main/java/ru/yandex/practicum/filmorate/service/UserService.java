@@ -52,6 +52,7 @@ public class UserService {
         friend.getFriendsId().add(userId);
         log.debug("Пользователь {} добавил в друзья пользователя {}", userId, friendId);
     }
+
     public void deleteFriend(Long userId, Long friendId) {
         User user = userStorage.getById(userId);
         User friend = userStorage.getById(friendId);
