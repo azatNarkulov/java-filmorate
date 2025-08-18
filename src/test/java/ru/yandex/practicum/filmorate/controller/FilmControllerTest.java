@@ -3,25 +3,30 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FilmControllerTest {
-
-    private FilmController filmController;
+    private final FilmStorage filmStorage = new InMemoryFilmStorage();
+    private final UserStorage userStorage = new InMemoryUserStorage();
+    private final FilmService filmService = new FilmService(filmStorage, userStorage);
     private Film film;
 
     @BeforeEach
     public void setUp() {
-        filmController = new FilmController();
         film = createValidFilm();
     }
 
     @Test
-    public void addFilm_addFilm_filmIsValid() {
-        Film addedFilm = filmController.addFilm(film);
+    public void createFilm_addFilm_filmIsValid() {
+        Film addedFilm = filmService.createFilm(film);
 
         assertNotNull(addedFilm);
         assertEquals(1, addedFilm.getId());
@@ -29,25 +34,39 @@ public class FilmControllerTest {
 
     @Test
     public void updateFilm_updateFilm_filmIsValid() {
-        filmController.addFilm(film);
+        filmService.createFilm(film);
         film.setName("Побег из курятника");
-        Film updatedFilm = filmController.updateFilm(film);
+        Film updatedFilm = filmService.updateFilm(film);
 
         assertEquals(film.getName(), updatedFilm.getName());
     }
 
     @Test
-    public void getFilms_getFilms() {
-        filmController.addFilm(film);
+    public void deleteFilm_deleteFilm() {
+        filmService.createFilm(film);
+        filmService.deleteFilm(film.getId());
+        assertEquals(filmService.getAllFilms().size(), 0);
+    }
+
+    @Test
+    public void getAllFilms_getFilms() {
+        filmService.createFilm(film);
 
         Film anotherFilm = new Film();
         anotherFilm.setName("Побег из курятника");
         anotherFilm.setDescription("Пластилиновый мультфильм");
         anotherFilm.setReleaseDate(LocalDate.of(2000, 6, 21));
         anotherFilm.setDuration(104);
-        filmController.addFilm(anotherFilm);
+        filmService.createFilm(anotherFilm);
 
-        assertEquals(2, filmController.getFilms().size());
+        assertEquals(2, filmService.getAllFilms().size());
+    }
+
+    @Test
+    public void getFilmById_getFilmById() {
+        filmService.createFilm(film);
+        Film receivedFilm = filmService.getFilmById(film.getId());
+        assertEquals(film.getId(), receivedFilm.getId());
     }
 
     private Film createValidFilm() {

@@ -15,9 +15,6 @@ import java.lang.annotation.Target;
 public @interface ValidReleaseDate {
     String message() default "Дата релиза не может быть раньше 28 декабря 1895 года";
 
-    // я до конца не понимаю значение двух нижних строк, но без них тесты в postman не проходят
-    // взял их из других нотаций
-    // это нормально? Не знаете случаем, будем ли мы проходить их в будущем?
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

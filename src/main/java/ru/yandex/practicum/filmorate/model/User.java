@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import ru.yandex.practicum.filmorate.annotation.LoginWithoutSpace;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
@@ -24,4 +26,6 @@ public class User {
 
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
+
+    private Set<Long> friendsId = new HashSet<>();
 }
