@@ -13,12 +13,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserControllerTest { // проверяю работу сервиса
     private final UserStorage userStorage = new InMemoryUserStorage();
-    private UserService userService;
+    private final UserService userService  = new UserService(userStorage);
     private User user;
 
     @BeforeEach
     public void setUp() {
-        userService = new UserService(userStorage);
         user = createValidUser();
     }
 

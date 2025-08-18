@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -16,8 +16,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
-        log.debug("Добавляем фильм: {}", film);
-
         film.setId(generateId());
         films.put(film.getId(), film);
         return film;
@@ -25,23 +23,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film newFilm) {
-        if (!films.containsKey(newFilm.getId())) {
-            throw new NotFoundException("Фильм с id " + newFilm.getId() + " не найден");
-        }
-        log.debug("Обновляем данные фильма: {}", newFilm);
-
         films.put(newFilm.getId(), newFilm);
         return newFilm;
     }
 
     @Override
     public Film deleteFilm(Long id) {
-        Film film = films.remove(id);
-        if (film == null) {
-            throw new NotFoundException("Фильм с id " + id + " не найден");
-        }
-        log.debug("Удаляем фильм: {}", film);
-        return film;
+        return films.remove(id);
     }
 
     @Override
@@ -50,12 +38,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getById(Long id) {
-        Film film = films.get(id);
-        if (film == null) {
-            throw new NotFoundException("Фильм с id " + id + " не найден");
-        }
-        return film;
+    public Optional<Film> getById(Long id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     private long generateId() {

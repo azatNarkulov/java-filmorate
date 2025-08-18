@@ -16,12 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FilmControllerTest {
     private final FilmStorage filmStorage = new InMemoryFilmStorage();
     private final UserStorage userStorage = new InMemoryUserStorage();
-    private FilmService filmService;
+    private final FilmService filmService = new FilmService(filmStorage, userStorage);
     private Film film;
 
     @BeforeEach
     public void setUp() {
-        filmService = new FilmService(filmStorage, userStorage);
         film = createValidFilm();
     }
 
