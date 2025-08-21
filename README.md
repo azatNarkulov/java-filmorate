@@ -1,2 +1,5 @@
 # java-filmorate
-Template repository for Filmorate project.
+
+Схема базы данных (таблицы хранения пользователей и фильмов)
+
+

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.user;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -28,4 +28,5 @@ public class User {
     private LocalDate birthday;
 
     private Set<Long> friendsId = new HashSet<>();
+    private Set<Friendship> friendships = new HashSet<>();
 }
