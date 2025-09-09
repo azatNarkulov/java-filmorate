@@ -8,10 +8,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.film.Genre;
 import ru.yandex.practicum.filmorate.storage.film.GenreStorage;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -48,7 +45,7 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public Set<Genre> getGenresByFilmId(Long filmId) {
-        return new HashSet<>(jdbcTemplate.query(FIND_BY_FILMID_QUERY, mapper, filmId));
+    public List<Genre> getGenresByFilmId(Long filmId) {
+        return jdbcTemplate.query(FIND_BY_FILMID_QUERY, mapper, filmId);
     }
 }

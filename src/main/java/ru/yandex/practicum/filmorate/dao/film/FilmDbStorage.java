@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.storage.film.GenreStorage;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component("filmDbStorage")
@@ -106,16 +105,10 @@ public class FilmDbStorage implements FilmStorage {
     private void saveFilmGenres(Film film) {
         if (film.getGenres() == null || film.getGenres().isEmpty()) return;
 
-        List<Genre> uniqueGenres = film.getGenres().stream()
+        Set<Genre> uniqueGenres = film.getGenres().stream()
                 .filter(Objects::nonNull)
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toMap(
-                                Genre::getId,
-                                Function.identity(),
-                                (existing, replacement) -> existing,
-                                LinkedHashMap::new
-                        ),
-                        map -> new ArrayList<>(map.values())
+                .collect(Collectors.toCollection(() ->
+                        new TreeSet<>(Comparator.comparingInt(Genre::getId))
                 ));
 
         for (Genre genre : uniqueGenres) {
@@ -126,7 +119,7 @@ public class FilmDbStorage implements FilmStorage {
     private RowMapper<Film> mapper() {
         return (rs, rowNum) -> {
             Film film = new Film();
-            film.setId(rs.getLong("id"));
+            film.setId(rs.getLong("film_id"));
             film.setName(rs.getString("name"));
             film.setDescription(rs.getString("description"));
             film.setReleaseDate(rs.getDate("release_date").toLocalDate());

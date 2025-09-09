@@ -12,5 +12,7 @@ public interface FriendshipStorage {
 
     List<User> findAllFriends(Long userId);
 
-    Set<User> findCommonFriends(Long userId, Long otherId);
+    List<User> findCommonFriends(Long userId, Long otherId);
+
+    Set<Long> findFriendIdsByUserId(Long userId);
 }

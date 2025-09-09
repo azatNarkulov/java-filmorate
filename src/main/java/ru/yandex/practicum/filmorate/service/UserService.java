@@ -50,44 +50,18 @@ public class UserService {
     }
 
     public void addFriend(Long userId, Long friendId) {
-        /*
-        User friend = getUserById(friendId);*/
-
-        /*if (user.getFriendsId().contains(friendId)) {
-            return;
-        }
-
-        user.getFriendsId().add(friendId);
-        friend.getFriendsId().add(userId);*/
-
-        User user = getUserById(userId);
+        getUserById(userId);
         getUserById(friendId);
 
-        user.getFriendsId().add(friendId);
-
         friendshipStorage.addFriend(userId, friendId);
-//        friendshipStorage.addFriend(friendId, userId);
         log.debug("Пользователь {} добавил в друзья пользователя {}", userId, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        /*
-        User friend = getUserById(friendId);
-
-        if (user.getFriendsId().remove(friendId)) {
-            friend.getFriendsId().remove(userId);
-            friendshipStorage.removeFriend(userId, friendId);
-            friendshipStorage.removeFriend(friendId, userId);
-            log.debug("Пользователь {} удалил пользователя {} из списка друзей", userId, friendId);
-        }*/
-
-        User user = getUserById(userId);
+        getUserById(userId);
         getUserById(friendId);
 
-        user.getFriendsId().remove(friendId);
-
         friendshipStorage.removeFriend(userId, friendId);
-//        friendshipStorage.removeFriend(friendId, userId);
         log.debug("Пользователь {} удалил пользователя {} из списка друзей", userId, friendId);
     }
 
@@ -97,23 +71,6 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(Long userId, Long otherId) {
-        /*getUserById(userId);
-        getUserById(otherId);
-        return friendshipStorage.findCommonFriends(userId, otherId);*/
-
-        /*User user = getUserById(userId);
-        User otherUser = getUserById(otherId);
-        Set<Long> userFriends = Optional.ofNullable(user.getFriendsId())
-                .orElse(Collections.emptySet());
-        Set<Long> otherUserFriends = Optional.ofNullable(otherUser.getFriendsId())
-                .orElse(Collections.emptySet());
-
-        return userFriends.stream()
-                .filter(otherUserFriends::contains)
-                .map(userStorage::getById)
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList());*/
-
         getUserById(userId);
         getUserById(otherId);
         return new ArrayList<>(friendshipStorage.findCommonFriends(userId, otherId));

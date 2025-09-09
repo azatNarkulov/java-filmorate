@@ -7,26 +7,20 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.user.User;
+import ru.yandex.practicum.filmorate.storage.user.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 @Component("userDbStorage")
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final RowMapper<User> mapper = (rs, rowNum) -> {
-        User user = new User();
-        user.setId(rs.getLong("id"));
-        user.setEmail(rs.getString("email"));
-        user.setLogin(rs.getString("login"));
-        user.setName(rs.getString("name"));
-        user.setBirthday(rs.getDate("birthday").toLocalDate());
-        return user;
-    };
+    private final FriendshipStorage friendshipStorage;
 
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
@@ -73,16 +67,32 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> getAllUsers() {
-        return jdbcTemplate.query(FIND_ALL_QUERY, mapper);
+        return jdbcTemplate.query(FIND_ALL_QUERY, mapper());
     }
 
     @Override
     public Optional<User> getById(Long id) {
         try {
-            User user = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, mapper, id);
+            User user = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, mapper(), id);
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException ignored) {
             return Optional.empty();
         }
+    }
+
+    private RowMapper<User> mapper() {
+        return (rs, rowNum) -> {
+            User user = new User();
+            user.setId(rs.getLong("id"));
+            user.setEmail(rs.getString("email"));
+            user.setLogin(rs.getString("login"));
+            user.setName(rs.getString("name"));
+            user.setBirthday(rs.getDate("birthday").toLocalDate());
+
+            Set<Long> friends = friendshipStorage.findFriendIdsByUserId(user.getId());
+            user.setFriendsId(friends);
+
+            return user;
+        };
     }
 }

@@ -25,6 +25,6 @@ public class MpaController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mpa getMpa(@PathVariable int id) {
-        return filmService.findmpaById(id);
+        return filmService.findMpaById(id);
     }
 }

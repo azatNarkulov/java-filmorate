@@ -6,7 +6,9 @@ import lombok.EqualsAndHashCode;
 import ru.yandex.practicum.filmorate.annotation.ValidReleaseDate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -30,7 +32,7 @@ public class Film {
 
     private Set<Long> likesId = new HashSet<>();
 
-    private Set<Genre> genres = new HashSet<>();
+    private List<Genre> genres = new ArrayList<>();
 
     private Mpa mpa;
 }

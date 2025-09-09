@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS users(
 CREATE TABLE IF NOT EXISTS friendship(
     user_id   BIGINT,
     friend_id BIGINT,
+    confirmed boolean DEFAULT FALSE,
     PRIMARY KEY(user_id, friend_id),
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(friend_id) REFERENCES users(id)

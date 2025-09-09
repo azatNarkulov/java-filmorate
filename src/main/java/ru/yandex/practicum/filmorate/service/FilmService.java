@@ -13,10 +13,7 @@ import ru.yandex.practicum.filmorate.storage.film.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.film.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -100,6 +97,9 @@ public class FilmService {
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getAllFilms().stream()
+                .peek(film -> {
+                    film.setLikesId(new HashSet<>(likeStorage.getLikesByFilmId(film.getId())));
+                })
                 .sorted(Comparator.comparingInt((Film film) -> film.getLikesId().size()).reversed())
                 .limit(count)
                 .toList();
@@ -118,7 +118,7 @@ public class FilmService {
         return new ArrayList<>(mpaStorage.getAllMpa());
     }
 
-    public Mpa findmpaById(int id) {
+    public Mpa findMpaById(int id) {
         return mpaStorage.getById(id)
                 .orElseThrow(() -> new NotFoundException("Рейтинг не найден"));
     }
