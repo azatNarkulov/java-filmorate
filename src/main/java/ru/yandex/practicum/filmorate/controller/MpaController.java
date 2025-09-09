@@ -18,13 +18,13 @@ public class MpaController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Mpa> getmpa() {
+    public Collection<Mpa> getMpa() {
         return filmService.findAllMpa();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Mpa getmpa(@PathVariable int id) {
+    public Mpa getMpa(@PathVariable int id) {
         return filmService.findmpaById(id);
     }
 }
