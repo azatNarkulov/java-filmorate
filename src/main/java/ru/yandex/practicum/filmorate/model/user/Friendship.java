@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-@RequiredArgsConstructor @Getter @Setter
+@RequiredArgsConstructor
+@Getter
+@Setter
 public class Friendship {
     private Long userId1;
     private Long userId2;
