@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
+@Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
     @ExceptionHandler(ValidationException.class)
@@ -32,6 +34,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // ошибка 500
     public ErrorResponse handleThrowable(final Throwable e) {
+        log.error("Необработанная ошибка", e);
         return new ErrorResponse("Произошла непредвиденная ошибка.");
     }
 }

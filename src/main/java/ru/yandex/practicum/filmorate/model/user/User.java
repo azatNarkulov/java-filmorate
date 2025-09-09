@@ -28,5 +28,4 @@ public class User {
     private LocalDate birthday;
 
     private Set<Long> friendsId = new HashSet<>();
-    private Set<Friendship> friendships = new HashSet<>();
 }
