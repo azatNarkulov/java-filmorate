@@ -21,23 +21,17 @@ public class GenreDbStorage implements GenreStorage {
         return new Genre(id, name);
     };
 
-    private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE id = ?";
-    private static final String FIND_BY_FILMID_QUERY = "SELECT * " +
-            "FROM genres g " +
-            "JOIN film_genres fg ON g.id = fg.genre_id " +
-            "WHERE film_id = ? " +
-            "ORDER BY g.id";
-
     @Override
     public Collection<Genre> getAllGenres() {
-        return jdbcTemplate.query(FIND_ALL_QUERY, mapper);
+        String findAllQuery = "SELECT * FROM genres";
+        return jdbcTemplate.query(findAllQuery, mapper);
     }
 
     @Override
     public Optional<Genre> getById(int id) {
+        String findByIdQuery = "SELECT * FROM genres WHERE id = ?";
         try {
-            Genre genre = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, mapper, id);
+            Genre genre = jdbcTemplate.queryForObject(findByIdQuery, mapper, id);
             return Optional.ofNullable(genre);
         } catch (EmptyResultDataAccessException ignored) {
             return Optional.empty();
@@ -46,6 +40,11 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public List<Genre> getGenresByFilmId(Long filmId) {
-        return jdbcTemplate.query(FIND_BY_FILMID_QUERY, mapper, filmId);
+        String findByFilmIdQuery = "SELECT * " +
+                "FROM genres g " +
+                "JOIN film_genres fg ON g.id = fg.genre_id " +
+                "WHERE film_id = ? " +
+                "ORDER BY g.id";
+        return jdbcTemplate.query(findByFilmIdQuery, mapper, filmId);
     }
 }

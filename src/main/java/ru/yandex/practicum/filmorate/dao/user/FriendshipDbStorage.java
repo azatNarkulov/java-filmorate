@@ -25,51 +25,50 @@ public class FriendshipDbStorage implements FriendshipStorage {
        return user;
     });
 
-    private static final String ADD_FRIEND_QUERY = "INSERT INTO friendship(user_id, friend_id, confirmed) VALUES(?, ?, ?)";
-    private static final String DELETE_FRIEND_QUERY = "DELETE FROM friendship WHERE user_id = ? AND friend_id = ?";
-    private static final String CHECK_FRIENDSHIP_QUERY = "SELECT COUNT(*) FROM friendship WHERE user_id = ? AND friend_id = ?";
-    private static final String CONFIRM_FRIENDSHIP_QUERY = "UPDATE friendship SET confirmed = true WHERE user_id = ? AND friend_id = ?";
-    private static final String FIND_FRIEND_IDS_QUERY = "SELECT friend_id FROM friendship WHERE user_id = ?";
-    private static final String FIND_COMMON_FRIENDS_QUERY = "SELECT u.* FROM users u " +
-            "JOIN friendship f1 ON u.id = f1.friend_id AND f1.user_id = ? " +
-            "JOIN friendship f2 ON u.id = f2.friend_id AND f2.user_id = ?";
-    private static final String FIND_ALL_FRIENDS_QUERY = "SELECT * " +
-            "FROM friendship f " +
-            "INNER JOIN users u ON u.id = f.friend_id " +
-            "WHERE f.user_id = ? " +
-            "ORDER BY u.id";
-
-
     @Override
     public void addFriend(Long userId, Long friendId) {
-        Integer count = jdbcTemplate.queryForObject(CHECK_FRIENDSHIP_QUERY, Integer.class, friendId, userId);
+        String addFriendQuery = "INSERT INTO friendship(user_id, friend_id, confirmed) VALUES(?, ?, ?)";
+        String checkFriendshipQuery = "SELECT COUNT(*) FROM friendship WHERE user_id = ? AND friend_id = ?";
+        String confirmFriendshipQuery = "UPDATE friendship SET confirmed = true WHERE user_id = ? AND friend_id = ?";
+
+        Integer count = jdbcTemplate.queryForObject(checkFriendshipQuery, Integer.class, friendId, userId);
         boolean confirmed = count != null && count > 0;
 
         if (confirmed) {
-            jdbcTemplate.update(CONFIRM_FRIENDSHIP_QUERY, friendId, userId);
-            jdbcTemplate.update(CONFIRM_FRIENDSHIP_QUERY, userId, friendId);
+            jdbcTemplate.update(confirmFriendshipQuery, friendId, userId);
+            jdbcTemplate.update(confirmFriendshipQuery, userId, friendId);
         } else {
-            jdbcTemplate.update(ADD_FRIEND_QUERY, userId, friendId, false);
+            jdbcTemplate.update(addFriendQuery, userId, friendId, false);
         }
     }
 
     @Override
     public void removeFriend(Long userId, Long friendId) {
-        jdbcTemplate.update(DELETE_FRIEND_QUERY, userId, friendId);
+        String deleteFriendQuery = "DELETE FROM friendship WHERE user_id = ? AND friend_id = ?";
+        jdbcTemplate.update(deleteFriendQuery, userId, friendId);
     }
 
     @Override
     public List<User> findAllFriends(Long userId) {
-        return jdbcTemplate.query(FIND_ALL_FRIENDS_QUERY, mapper, userId);
+        String findAllFriendsQuery = "SELECT * " +
+                "FROM friendship f " +
+                "INNER JOIN users u ON u.id = f.friend_id " +
+                "WHERE f.user_id = ? " +
+                "ORDER BY u.id";
+        return jdbcTemplate.query(findAllFriendsQuery, mapper, userId);
     }
 
     @Override
     public List<User> findCommonFriends(Long userId, Long otherId) {
-        return jdbcTemplate.query(FIND_COMMON_FRIENDS_QUERY, mapper, userId, otherId);
+        String findCommonFriendsQuery = "SELECT u.* FROM users u " +
+                "JOIN friendship f1 ON u.id = f1.friend_id AND f1.user_id = ? " +
+                "JOIN friendship f2 ON u.id = f2.friend_id AND f2.user_id = ?";
+        return jdbcTemplate.query(findCommonFriendsQuery, mapper, userId, otherId);
     }
 
     @Override
     public Set<Long> findFriendIdsByUserId(Long userId) {
-        return new HashSet<>(jdbcTemplate.query(FIND_FRIEND_IDS_QUERY, (rs, rowNum) -> rs.getLong("friend_id"), userId));
+        String findFriendsIdsQuery = "SELECT friend_id FROM friendship WHERE user_id = ?";
+        return new HashSet<>(jdbcTemplate.query(findFriendsIdsQuery, (rs, rowNum) -> rs.getLong("friend_id"), userId));
     }
 }

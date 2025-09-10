@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.model.film;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 @AllArgsConstructor
 public class Genre {
     private final int id;

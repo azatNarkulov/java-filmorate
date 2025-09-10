@@ -22,19 +22,13 @@ public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FriendshipStorage friendshipStorage;
 
-    private static final String FIND_ALL_QUERY = "SELECT * FROM users";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
-    private static final String INSERT_QUERY = "INSERT INTO users(email, login, name, birthday) " +
-            "VALUES (?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE users SET email = ?, login = ?, " +
-            "name = ?, birthday = ? WHERE id = ?";
-    private static final String DELETE_QUERY = "DELETE FROM users WHERE id = ?";
-
     @Override
     public User addUser(User user) {
+        String insertQuery = "INSERT INTO users(email, login, name, birthday) " +
+                "VALUES (?, ?, ?, ?)";
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(INSERT_QUERY, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = con.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getLogin());
             ps.setString(3, user.getName());
@@ -50,7 +44,9 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        jdbcTemplate.update(UPDATE_QUERY,
+        String updateQuery = "UPDATE users SET email = ?, login = ?, " +
+                "name = ?, birthday = ? WHERE id = ?";
+        jdbcTemplate.update(updateQuery,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
@@ -62,18 +58,21 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void deleteUser(Long id) {
-        jdbcTemplate.update(DELETE_QUERY, id);
+        String deleteQuery = "DELETE FROM users WHERE id = ?";
+        jdbcTemplate.update(deleteQuery, id);
     }
 
     @Override
     public Collection<User> getAllUsers() {
-        return jdbcTemplate.query(FIND_ALL_QUERY, mapper());
+        String findAllQuery = "SELECT * FROM users";
+        return jdbcTemplate.query(findAllQuery, mapper());
     }
 
     @Override
     public Optional<User> getById(Long id) {
+        String findByIdQuery = "SELECT * FROM users WHERE id = ?";
         try {
-            User user = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, mapper(), id);
+            User user = jdbcTemplate.queryForObject(findByIdQuery, mapper(), id);
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException ignored) {
             return Optional.empty();
