@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.film;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -29,4 +29,8 @@ public class Film {
     private int duration;
 
     private Set<Long> likesId = new HashSet<>();
+
+    private Set<Genre> genres = new HashSet<>();
+
+    private Mpa mpa;
 }
