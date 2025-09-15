@@ -7,6 +7,9 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Genre;
 import ru.yandex.practicum.filmorate.model.film.Mpa;
+import ru.yandex.practicum.filmorate.model.user.Event;
+import ru.yandex.practicum.filmorate.model.user.EventType;
+import ru.yandex.practicum.filmorate.model.user.Operation;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.film.LikeStorage;
@@ -23,17 +26,20 @@ public class FilmService {
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
     private final LikeStorage likeStorage;
+    private final UserService userService;
 
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                        @Qualifier("userDbStorage") UserStorage userStorage,
                        GenreStorage genreStorage,
                        MpaStorage mpaStorage,
-                       LikeStorage likeStorage) {
+                       LikeStorage likeStorage,
+                       UserService userService) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
         this.likeStorage = likeStorage;
+        this.userService = userService;
     }
 
     public Film getFilmById(Long id) {
@@ -85,6 +91,7 @@ public class FilmService {
         }
         likeStorage.addLike(filmId, userId);
         log.debug("Пользователь {} поставил лайк фильму {}", userId, filmId);
+        userService.createEvent(new Event(userId, EventType.LIKE, Operation.ADD, filmId));
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -93,6 +100,7 @@ public class FilmService {
         }
         likeStorage.removeLike(filmId, userId);
         log.debug("Пользователь {} убрал лайк к фильму {}", userId, filmId);
+        userService.createEvent(new Event(userId, EventType.LIKE, Operation.REMOVE, filmId));
     }
 
     public List<Film> getPopularFilms(int count) {
