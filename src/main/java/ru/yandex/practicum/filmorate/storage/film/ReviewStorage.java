@@ -23,6 +23,6 @@ public interface ReviewStorage {
     void removeLike(Long reviewId, Long userId);
 
     boolean hasLike(Long reviewId, Long userId);
-    
+
     boolean getLikeType(Long reviewId, Long userId);
 }
