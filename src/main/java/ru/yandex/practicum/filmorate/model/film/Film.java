@@ -33,4 +33,6 @@ public class Film {
     private Set<Genre> genres = new HashSet<>();
 
     private Mpa mpa;
+
+    private Set<Review> reviews = new HashSet<>();
 }
