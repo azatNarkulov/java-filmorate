@@ -34,16 +34,16 @@ CREATE TABLE IF NOT EXISTS friendship(
     friend_id BIGINT,
     confirmed boolean DEFAULT FALSE,
     PRIMARY KEY(user_id, friend_id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(friend_id) REFERENCES users(id)
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(friend_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS likes(
     film_id BIGINT,
     user_id BIGINT,
     PRIMARY KEY(film_id, user_id),
-    FOREIGN KEY(film_id) REFERENCES films(id),
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    FOREIGN KEY(film_id) REFERENCES films(id) ON DELETE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS genres(
@@ -55,6 +55,6 @@ CREATE TABLE IF NOT EXISTS film_genres(
     genre_id INT,
     film_id  BIGINT,
     PRIMARY KEY(genre_id, film_id),
-    FOREIGN KEY(genre_id) REFERENCES genres(id),
-    FOREIGN KEY(film_id) REFERENCES films(id)
+    FOREIGN KEY(genre_id) REFERENCES genres(id) ON DELETE CASCADE,
+    FOREIGN KEY(film_id) REFERENCES films(id) ON DELETE CASCADE
 );
