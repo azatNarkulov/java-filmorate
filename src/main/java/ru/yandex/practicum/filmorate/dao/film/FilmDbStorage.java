@@ -135,6 +135,19 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    public List<Film> getTopFilmsByGenreAndYear(int limit, Integer genreId, String year) {
+        String sql;
+        sql = "SELECT f.FILM_ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, f.MPA_ID," +
+                "r.RATING, count(fl.USER_ID) AS likes FROM FILM f \n" +
+                "JOIN MPA r ON f.MPA_ID = r.MPA_ID \n" +
+                "LEFT JOIN FILM_LIKE fl ON f.FILM_ID = fl.FILM_ID \n" +
+                "LEFT JOIN FILM_GENRE fg ON f.FILM_ID = fg.FILM_ID \n" +
+                "WHERE YEAR(f.RELEASE_DATE) = ? AND fg.GENRE_ID = ?" +
+                "GROUP BY f.FILM_ID \n" +
+                "ORDER BY likes desc limit ?";
+        return jdbcTemplate.query(sql, mapper(), year, genreId, limit);
+    }
+
     private void saveFilmGenres(Film film) {
         String insertGenresQuery = "INSERT INTO film_genres(film_id, genre_id) " +
                 "VALUES (?, ?)";
