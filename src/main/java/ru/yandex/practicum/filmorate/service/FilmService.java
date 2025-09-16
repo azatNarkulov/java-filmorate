@@ -105,10 +105,6 @@ public class FilmService {
                 .toList();
     }
 
-    public List<Film>  getTopFilmsByGenreAndYear(int id, Integer genreId, String year) {
-        return filmStorage.getTopFilmsByGenreAndYear(id, genreId, year);
-    }
-
     public List<Genre> findAllGenres() {
         return new ArrayList<>(genreStorage.getAllGenres());
     }

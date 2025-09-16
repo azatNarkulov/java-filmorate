@@ -15,7 +15,5 @@ public interface FilmStorage {
 
     Collection<Film> getAllFilms();
 
-    List<Film> getTopFilmsByGenreAndYear(int limit, Integer genreId, String year);
-
     Optional<Film> getById(Long id);
 }
