@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,16 +31,9 @@ public class FilmController {
 
     @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") @Positive int count) {
-        return filmService.getPopularFilms(count);
+    public Collection<Film> getTopFilmsByGenreAndYear(@RequestParam(defaultValue = "10") int count, @RequestParam Integer genreId, @RequestParam String year) {
+        return filmService.getTopFilmsByGenreAndYear(count, genreId, year);
     }
-
-    @GetMapping("/common")
-    @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
-        return filmService.getCommonFilms(userId, friendId);
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film addFilm(@Valid @RequestBody Film film) {

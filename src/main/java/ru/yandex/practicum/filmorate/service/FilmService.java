@@ -80,8 +80,8 @@ public class FilmService {
         filmStorage.deleteFilm(id);
     }
 
-    public List<Film> getCommonFilms(Long userId, Long friendId) {
-        return filmDbStorage.getCommonFilms(userId,friendId);
+    public List<Film>  getTopFilmsByGenreAndYear(int id, Integer genreId, String year) {
+        return filmDbStorage.getTopFilmsByGenreAndYear(id, genreId, year);
     }
 
     public Collection<Film> getAllFilms() {
