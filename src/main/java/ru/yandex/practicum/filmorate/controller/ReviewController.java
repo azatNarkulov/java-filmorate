@@ -4,78 +4,80 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.film.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
-import java.util.List;
+import java.util.Collection;
 
 @RestController
+@Slf4j
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
-@Slf4j
 public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<Review> addReview(@Valid @RequestBody Review review) {
-        Review addedReview = reviewService.addReview(review);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedReview);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Review addReview(@Valid @RequestBody Review review) {
+        log.info("Добавление нового отзыва");
+        return reviewService.addReview(review);
     }
 
     @PutMapping
-    public ResponseEntity<Review> updateReview(@Valid @RequestBody Review review) {
-        Review updatedReview = reviewService.updateReview(review);
-        return ResponseEntity.ok(updatedReview);
+    @ResponseStatus(HttpStatus.OK)
+    public Review updateReview(@Valid @RequestBody Review review) {
+        return reviewService.updateReview(review);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteReview(@PathVariable Long id) {
+        log.info("Удаление отзыва с ID: {}", id);
         reviewService.deleteReview(id);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Review> getReviewById(@PathVariable Long id) {
-        Review review = reviewService.getReviewById(id);
-        return ResponseEntity.ok(review);
+    @ResponseStatus(HttpStatus.OK)
+    public Review getReviewById(@PathVariable Long id) {
+        log.info("Получение отзыва по ID: {}", id);
+        return reviewService.getReviewById(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<Review>> getReviews(
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Review> getReviews(
             @RequestParam(required = false) Long filmId,
             @RequestParam(required = false, defaultValue = "10") Integer count) {
-        List<Review> reviews = reviewService.getReviews(filmId, count);
-        return ResponseEntity.ok(reviews);
+        log.info("Получение списка отзывов для фильма ID: {}, количество: {}", filmId, count);
+        return reviewService.getReviews(filmId, count);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity<Void> addLike(@PathVariable Long id, @PathVariable Long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public void addLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Добавление лайка к отзыву ID: {} от пользователя ID: {}", id, userId);
         reviewService.addLike(id, userId, true);
-        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    public ResponseEntity<Void> addDislike(@PathVariable Long id, @PathVariable Long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public void addDislike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Добавление дизлайка к отзыву ID: {} от пользователя ID: {}", id, userId);
         reviewService.addLike(id, userId, false);
-        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<Void> removeLike(@PathVariable Long id, @PathVariable Long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Удаление лайка от отзыва ID: {} пользователем ID: {}", id, userId);
         reviewService.removeLike(id, userId);
-        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    public ResponseEntity<Void> removeDislike(@PathVariable Long id, @PathVariable Long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public void removeDislike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Удаление дизлайка от отзыва ID: {} пользователем ID: {}", id, userId);
         reviewService.removeLike(id, userId);
-        return ResponseEntity.ok().build();
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 }

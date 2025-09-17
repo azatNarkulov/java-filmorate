@@ -1,26 +1,49 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Review;
+import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.storage.film.*;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class ReviewService {
     private final ReviewStorage reviewStorage;
+    private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
+
+    public ReviewService(ReviewStorage reviewStorage,
+                         @Qualifier("userDbStorage") UserStorage userStorage,
+                         @Qualifier("filmDbStorage") FilmStorage filmStorage) {
+        this.reviewStorage = reviewStorage;
+        this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
+    }
 
     public Review addReview(Review review) {
+        Optional<User> userOpt = userStorage.getById(review.getUserId());
+        if (userOpt.isEmpty()) {
+            throw new NotFoundException("Пользователь с ID " + review.getUserId() + " не найден");
+        }
+
+        Optional<Film> filmOpt = filmStorage.getById(review.getFilmId());
+        if (filmOpt.isEmpty()) {
+            throw new NotFoundException("Фильм с ID " + review.getFilmId() + " не найден");
+        }
         return reviewStorage.add(review);
     }
 
     public Review updateReview(Review review) {
         if (reviewStorage.getById(review.getId()) == null) {
-            throw new RuntimeException("Отзыв не найден");
+            throw new NotFoundException("Отзыв не найден");
         }
         return reviewStorage.update(review);
     }
@@ -30,11 +53,17 @@ public class ReviewService {
     }
 
     public Review getReviewById(Long id) {
-        Review review = reviewStorage.getById(id);
-        if (review == null) {
-            throw new RuntimeException("Отзыв не найден");
+        log.info("Получение отзыва по ID: {}", id);
+        try {
+            Review review = reviewStorage.getById(id);
+            if (review == null) {
+                throw new NotFoundException("Отзыв с ID " + id + " не найден");
+            }
+            return review;
+        } catch (Exception e) {
+            log.warn("Ошибка при получении отзыва с ID {}: {}", id, e.getMessage());
+            throw new NotFoundException("Отзыв с ID " + id + " не найден");
         }
-        return review;
     }
 
     public List<Review> getReviews(Long filmId, Integer count) {
