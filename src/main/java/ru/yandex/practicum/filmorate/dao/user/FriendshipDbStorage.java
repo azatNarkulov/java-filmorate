@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.storage.user.FriendshipStorage;
 
@@ -17,27 +16,30 @@ import java.util.Set;
 public class FriendshipDbStorage implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> mapper = ((rs, rowNum) -> {
-       User user = new User();
-       user.setId(rs.getLong("id"));
-       user.setEmail(rs.getString("email"));
-       user.setLogin(rs.getString("login"));
-       user.setName(rs.getString("name"));
-       user.setBirthday(rs.getDate("birthday").toLocalDate());
-       return user;
+        User user = new User();
+        user.setId(rs.getLong("id"));
+        user.setEmail(rs.getString("email"));
+        user.setLogin(rs.getString("login"));
+        user.setName(rs.getString("name"));
+        user.setBirthday(rs.getDate("birthday").toLocalDate());
+        return user;
     });
 
     @Override
     public void addFriend(Long userId, Long friendId) {
-        String checkUserQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
-        Integer userCount = jdbcTemplate.queryForObject(checkUserQuery, Integer.class, userId);
-        Integer friendCount = jdbcTemplate.queryForObject(checkUserQuery, Integer.class, friendId);
+        String addFriendQuery = "INSERT INTO friendship(user_id, friend_id, confirmed) VALUES(?, ?, ?)";
+        String checkFriendshipQuery = "SELECT COUNT(*) FROM friendship WHERE user_id = ? AND friend_id = ?";
+        String confirmFriendshipQuery = "UPDATE friendship SET confirmed = true WHERE user_id = ? AND friend_id = ?";
 
-        if (userCount == 0 || friendCount == 0) {
-            throw new NotFoundException("Пользователь не найден");
+        Integer count = jdbcTemplate.queryForObject(checkFriendshipQuery, Integer.class, friendId, userId);
+        boolean confirmed = count != null && count > 0;
+
+        if (confirmed) {
+            jdbcTemplate.update(confirmFriendshipQuery, friendId, userId);
+            jdbcTemplate.update(confirmFriendshipQuery, userId, friendId);
+        } else {
+            jdbcTemplate.update(addFriendQuery, userId, friendId, false);
         }
-
-        String addFriendQuery = "INSERT INTO friendship(user_id, friend_id, confirmed) VALUES(?, ?, false)";
-        jdbcTemplate.update(addFriendQuery, userId, friendId);
     }
 
     @Override
