@@ -34,6 +34,7 @@ public class FilmController {
     public Collection<Film> getTopFilmsByGenreAndYear(@RequestParam(defaultValue = "10") int count, @RequestParam Integer genreId, @RequestParam String year) {
         return filmService.getTopFilmsByGenreAndYear(count, genreId, year);
     }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film addFilm(@Valid @RequestBody Film film) {
