@@ -167,7 +167,7 @@ public class FilmDbStorage implements FilmStorage {
     private RowMapper<Film> mapper() {
         return (rs, rowNum) -> {
             Film film = new Film();
-            film.setId(rs.getLong("film_id"));
+            film.setId(rs.getLong("id"));
             film.setName(rs.getString("name"));
             film.setDescription(rs.getString("description"));
             film.setReleaseDate(rs.getDate("release_date").toLocalDate());
