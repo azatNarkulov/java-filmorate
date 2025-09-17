@@ -66,6 +66,19 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
+    public List<Film> getTopFilmsByGenreAndYear(int limit, Integer genreId, String year) {
+        String sql;
+        sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id," +
+                "r.mpa_name, count(fl.user_id) AS flikes FROM films f \n" +
+                "JOIN mpa r ON f.mpa_id = r.id \n" +
+                "LEFT JOIN likes fl ON f.id = fl.film_id \n" +
+                "LEFT JOIN film_genres fg ON f.id = fg.film_id \n" +
+                "WHERE YEAR(f.release_date) = ? AND fg.genre_id = ?" +
+                "GROUP BY f.id \n" +
+                "ORDER BY flikes desc limit ?";
+        return jdbcTemplate.query(sql, mapper(), year, genreId, limit);
+    }
+
     @Override
     public void deleteFilm(Long id) {
         String deleteGenresQuery = "DELETE FROM film_genres " +

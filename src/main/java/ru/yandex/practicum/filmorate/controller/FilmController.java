@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -52,6 +53,12 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteFilm(@PathVariable Long id) {
         filmService.deleteFilm(id);
+    }
+
+    @GetMapping("/popular")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Film> getTopFilmsByGenreAndYear(@RequestParam(defaultValue = "10") int count, @RequestParam Integer genreId, @RequestParam String year) {
+        return filmService.getTopFilmsByGenreAndYear(count, genreId,year);
     }
 
     @PutMapping("/{id}/like/{userId}")
