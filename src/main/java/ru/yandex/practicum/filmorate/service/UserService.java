@@ -24,18 +24,19 @@ public class UserService {
     private final FriendshipStorage friendshipStorage;
     private final LikeStorage likeStorage;
     private final FilmService filmService;
-    private final EventStorage eventStorage;
+    private final EventService eventService;
 
     public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
                        FriendshipStorage friendshipStorage,
                        LikeStorage likeStorage,
                        FilmService filmService,
+                       EventService eventService,
                        EventStorage eventStorage) {
         this.userStorage = userStorage;
         this.friendshipStorage = friendshipStorage;
         this.likeStorage = likeStorage;
         this.filmService = filmService;
-        this.eventStorage = eventStorage;
+        this.eventService = eventService;
     }
 
     public User getUserById(Long id) {
@@ -72,7 +73,7 @@ public class UserService {
 
         friendshipStorage.addFriend(userId, friendId);
         log.debug("Пользователь {} добавил в друзья пользователя {}", userId, friendId);
-        createEvent(new Event(userId, EventType.FRIEND, Operation.ADD, friendId));
+        eventService.createEvent(new Event(userId, EventType.FRIEND, Operation.ADD, friendId));
     }
 
     public void deleteFriend(Long userId, Long friendId) {
@@ -81,7 +82,7 @@ public class UserService {
 
         friendshipStorage.removeFriend(userId, friendId);
         log.debug("Пользователь {} удалил пользователя {} из списка друзей", userId, friendId);
-        createEvent(new Event(userId, EventType.FRIEND, Operation.REMOVE, friendId));
+        eventService.createEvent(new Event(userId, EventType.FRIEND, Operation.REMOVE, friendId));
     }
 
     public List<User> getFriends(Long id) {
@@ -123,14 +124,6 @@ public class UserService {
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
-    }
-
-    public Event createEvent(Event event) {
-        return eventStorage.create(event);
-    }
-
-    public List<Event> getEventsByUserId(Long userId) {
-        return eventStorage.getEventsByUserId(userId);
     }
 
     private void setNameIfEmpty(User user) {

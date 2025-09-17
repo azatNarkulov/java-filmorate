@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.user.Event;
 import ru.yandex.practicum.filmorate.model.user.User;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final EventService eventService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -83,6 +85,6 @@ public class UserController {
     @GetMapping("/{id}/feed")
     @ResponseStatus(HttpStatus.OK)
     public List<Event> getUserFeed(@PathVariable Long id) {
-        return userService.getEventsByUserId(id);
+        return eventService.getEventsByUserId(id);
     }
 }
