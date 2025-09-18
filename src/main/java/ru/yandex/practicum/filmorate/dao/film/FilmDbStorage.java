@@ -191,10 +191,48 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        String sql;
+        sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id, " +
+                "r.mpa_name, count(fl.user_id) AS flikes FROM films f " +
+                "JOIN mpa r ON f.mpa_id = r.id " +
+                "LEFT JOIN likes fl ON f.id = fl.film_id " +
+                "WHERE fl.user_id = ? AND f.id IN (SELECT l.film_id " +
+                "FROM likes l WHERE l.user_id = ? )" +
+                "GROUP BY f.id " +
+                "ORDER BY flikes desc";
+
+        List<Film> films = jdbcTemplate.query(sql, mapper(), userId, friendId);
+        if (films.isEmpty()) return films;
+
+        Map<Long, Film> filmMap = new HashMap<>();
+        for (Film film : films) {
+            filmMap.put(film.getId(), film);
+        }
+
+        List<Long> filmsIds = new ArrayList<>(filmMap.keySet());
+
+        String findGenresForFilmQuery = "SELECT fg.film_id, g.id AS genre_id, g.genre_name " +
+                "FROM film_genres fg " +
+                "JOIN genres g ON fg.genre_id = g.id " +
+                "WHERE fg.film_id IN (" + String.join(",", Collections.nCopies(filmsIds.size(), "?")) + ")";
+
+        jdbcTemplate.query(findGenresForFilmQuery, filmsIds.toArray(), (rs) -> {
+            long filmId = rs.getLong("film_id");
+            Film film = filmMap.get(filmId);
+
+            if (film != null) {
+                Genre genre = new Genre(rs.getInt("genre_id"), rs.getString("genre_name"));
+                film.getGenres().add(genre);
+            }
+        });
+        return films;
+    }
+
     private RowMapper<Film> mapper() {
         return (rs, rowNum) -> {
             Film film = new Film();
-            film.setId(rs.getLong("film_id"));
+            film.setId(rs.getLong("id"));
             film.setName(rs.getString("name"));
             film.setDescription(rs.getString("description"));
             film.setReleaseDate(rs.getDate("release_date").toLocalDate());

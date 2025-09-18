@@ -38,4 +38,6 @@ public class Film {
     private Mpa mpa;
 
     private Set<Director> directors = new HashSet<>();
+
+    private Set<Review> reviews = new HashSet<>();
 }
