@@ -249,7 +249,9 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE YEAR(f.release_date) = ? AND fg.genre_id = ?" +
                 "GROUP BY f.id \n" +
                 "ORDER BY flikes desc limit ?";
-        return jdbcTemplate.query(sql, mapper(), year, genreId, limit);
+        List<Film> films = jdbcTemplate.query(sql, mapper(), year, genreId, limit);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
     }
 
     public List<Film> getTopFilmsByGenre(int limit, Integer genreId) {
@@ -262,7 +264,9 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE fg.genre_id = ?" +
                 "GROUP BY f.id \n" +
                 "ORDER BY flikes desc limit ?";
-        return jdbcTemplate.query(sql, mapper(), genreId, limit);
+        List<Film> films =  jdbcTemplate.query(sql, mapper(), genreId, limit);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
     }
 
     public List<Film> getTopFilmsByYear(int limit, String year) {
@@ -275,7 +279,9 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE YEAR(f.release_date) = ? " +
                 "GROUP BY f.id \n" +
                 "ORDER BY flikes desc limit ?";
-        return jdbcTemplate.query(sql, mapper(), year, limit);
+        List<Film> films =  jdbcTemplate.query(sql, mapper(), year, limit);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
     }
 
     private RowMapper<Film> mapper() {
