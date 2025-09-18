@@ -45,4 +45,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     private long generateId() {
         return id++;
     }
+
+    @Override
+    public Collection<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        throw new UnsupportedOperationException("Метод не реализован для in-memory хранилища");
+    }
 }

@@ -24,6 +24,7 @@ public class FilmService {
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
     private final LikeStorage likeStorage;
+    private final DirectorService directorService;
 
     private final FilmDbStorage filmDbStorage;
 
@@ -32,12 +33,14 @@ public class FilmService {
                        GenreStorage genreStorage,
                        MpaStorage mpaStorage,
                        LikeStorage likeStorage,
+                       DirectorService directorService,
                        FilmDbStorage filmDbStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
         this.likeStorage = likeStorage;
+        this.directorService = directorService;
         this.filmDbStorage = filmDbStorage;
     }
 
@@ -70,8 +73,12 @@ public class FilmService {
     public Film updateFilm(Film newFilm) {
         getFilmById(newFilm.getId());
         log.debug("Обновляем данные фильма: {}", newFilm);
-        filmStorage.updateFilm(newFilm);
-        return getFilmById(newFilm.getId());
+        if (newFilm.getDirectors() != null) {
+            newFilm.getDirectors().forEach(director ->
+                    directorService.getById(director.getId())
+            );
+        }
+        return filmStorage.updateFilm(newFilm);
     }
 
     public void deleteFilm(Long id) {
@@ -135,5 +142,10 @@ public class FilmService {
     private void checkUserExist(Long userId) {
         userStorage.getById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
+    }
+
+    public Collection<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        directorService.getById(directorId);
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
 }
