@@ -36,6 +36,12 @@ public class FilmController {
         return filmService.getPopularFilms(count);
     }
 
+    @GetMapping("/common")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film addFilm(@Valid @RequestBody Film film) {
@@ -64,5 +70,13 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
         filmService.deleteLike(id, userId);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getFilmsByDirector(
+            @PathVariable Long directorId,
+            @RequestParam String sortBy) {
+
+        return filmService.getFilmsByDirector(directorId, sortBy);
     }
 }
