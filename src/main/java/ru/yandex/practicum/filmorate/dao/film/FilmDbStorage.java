@@ -230,7 +230,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getFilmsByDirectorOrTitleSortByLike(String query, String director, String title) {
-        List<Film> films= new ArrayList<>();
+        List<Film> films = new ArrayList<>();
 
         if (!title.isEmpty() && !director.isEmpty()) {
             films = getFilmsByDirectorOrTitleSortByLike(query);
