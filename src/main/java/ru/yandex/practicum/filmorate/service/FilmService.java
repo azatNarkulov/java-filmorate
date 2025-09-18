@@ -97,7 +97,7 @@ public class FilmService {
     }
 
     public List<Film>  getTopFilmsByGenreAndYear(int id, Integer genreId, String year) {
-        return filmDbStorage.getTopFilmsByGenreOrYear(id, genreId, year);
+        return filmDbStorage.getTopFilmsByGenreAndYear(id, genreId, year);
     }
 
     public Collection<Film> getAllFilms() {
