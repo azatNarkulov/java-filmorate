@@ -236,6 +236,9 @@ public class FilmDbStorage implements FilmStorage {
         if (year.isEmpty()) {
             return  getTopFilmsByGenre(limit, genreId);
         }
+        if ((genreId == null) && year.isEmpty()) {
+            return  getTopFilms(limit);
+        }
         return getTopFilmsByYear(limit, year);
     }
 
@@ -265,6 +268,20 @@ public class FilmDbStorage implements FilmStorage {
                 "GROUP BY f.id \n" +
                 "ORDER BY flikes desc limit ?";
         List<Film> films =  jdbcTemplate.query(sql, mapper(), genreId, limit);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
+    }
+
+    public List<Film> getTopFilms(int limit) {
+        String sql;
+        sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id," +
+                "r.mpa_name, count(fl.user_id) AS flikes FROM films f \n" +
+                "JOIN mpa r ON f.mpa_id = r.id \n" +
+                "LEFT JOIN likes fl ON f.id = fl.film_id \n" +
+                "LEFT JOIN film_genres fg ON f.id = fg.film_id \n" +
+                "GROUP BY f.id \n" +
+                "ORDER BY flikes desc limit ?";
+        List<Film> films =  jdbcTemplate.query(sql, mapper(), limit);
         loadGenresAndDirectorsForFilms(films);
         return films;
     }
