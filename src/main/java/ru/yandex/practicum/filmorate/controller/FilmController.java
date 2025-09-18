@@ -42,6 +42,11 @@ public class FilmController {
         return filmService.getCommonFilms(userId, friendId);
     }
 
+    @GetMapping("/search")
+    public Collection<Film> getFilmsByDirectorOrTitle(@RequestParam String query, @RequestParam String by) {
+        return filmService.getFilmsByDirectorOrTitleSortByLike(query, by);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film addFilm(@Valid @RequestBody Film film) {
