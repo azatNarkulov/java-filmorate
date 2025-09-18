@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Genre;
@@ -24,16 +25,20 @@ public class FilmService {
     private final MpaStorage mpaStorage;
     private final LikeStorage likeStorage;
 
+    private final FilmDbStorage filmDbStorage;
+
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                        @Qualifier("userDbStorage") UserStorage userStorage,
                        GenreStorage genreStorage,
                        MpaStorage mpaStorage,
-                       LikeStorage likeStorage) {
+                       LikeStorage likeStorage,
+                       FilmDbStorage filmDbStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
         this.likeStorage = likeStorage;
+        this.filmDbStorage = filmDbStorage;
     }
 
     public Film getFilmById(Long id) {
@@ -73,6 +78,10 @@ public class FilmService {
         Film film = getFilmById(id);
         log.debug("Удаляем фильм: {}", film);
         filmStorage.deleteFilm(id);
+    }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return filmDbStorage.getCommonFilms(userId,friendId);
     }
 
     public Collection<Film> getAllFilms() {
