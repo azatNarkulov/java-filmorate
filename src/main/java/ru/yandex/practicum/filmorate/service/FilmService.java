@@ -8,6 +8,9 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Genre;
 import ru.yandex.practicum.filmorate.model.film.Mpa;
+import ru.yandex.practicum.filmorate.model.user.Event;
+import ru.yandex.practicum.filmorate.model.user.EventType;
+import ru.yandex.practicum.filmorate.model.user.Operation;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.film.LikeStorage;
@@ -24,8 +27,8 @@ public class FilmService {
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
     private final LikeStorage likeStorage;
+    private final EventService eventService;
     private final DirectorService directorService;
-
     private final FilmDbStorage filmDbStorage;
 
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
@@ -33,6 +36,7 @@ public class FilmService {
                        GenreStorage genreStorage,
                        MpaStorage mpaStorage,
                        LikeStorage likeStorage,
+                       EventService eventService,
                        DirectorService directorService,
                        FilmDbStorage filmDbStorage) {
         this.filmStorage = filmStorage;
@@ -40,6 +44,7 @@ public class FilmService {
         this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
         this.likeStorage = likeStorage;
+        this.eventService = eventService;
         this.directorService = directorService;
         this.filmDbStorage = filmDbStorage;
     }
@@ -101,6 +106,7 @@ public class FilmService {
         }
         likeStorage.addLike(filmId, userId);
         log.debug("Пользователь {} поставил лайк фильму {}", userId, filmId);
+        eventService.createEvent(new Event(userId, EventType.LIKE, Operation.ADD, filmId));
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -109,6 +115,7 @@ public class FilmService {
         }
         likeStorage.removeLike(filmId, userId);
         log.debug("Пользователь {} убрал лайк к фильму {}", userId, filmId);
+        eventService.createEvent(new Event(userId, EventType.LIKE, Operation.REMOVE, filmId));
     }
 
     public List<Film> getPopularFilms(int count) {

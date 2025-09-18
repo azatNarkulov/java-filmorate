@@ -5,8 +5,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
+import ru.yandex.practicum.filmorate.model.user.Event;
+import ru.yandex.practicum.filmorate.model.user.EventType;
+import ru.yandex.practicum.filmorate.model.user.Operation;
 import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.storage.film.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.user.EventStorage;
 import ru.yandex.practicum.filmorate.storage.user.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -20,15 +24,19 @@ public class UserService {
     private final FriendshipStorage friendshipStorage;
     private final LikeStorage likeStorage;
     private final FilmService filmService;
+    private final EventService eventService;
 
     public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
                        FriendshipStorage friendshipStorage,
                        LikeStorage likeStorage,
-                       FilmService filmService) {
+                       FilmService filmService,
+                       EventService eventService,
+                       EventStorage eventStorage) {
         this.userStorage = userStorage;
         this.friendshipStorage = friendshipStorage;
         this.likeStorage = likeStorage;
         this.filmService = filmService;
+        this.eventService = eventService;
     }
 
     public User getUserById(Long id) {
@@ -65,6 +73,7 @@ public class UserService {
 
         friendshipStorage.addFriend(userId, friendId);
         log.debug("Пользователь {} добавил в друзья пользователя {}", userId, friendId);
+        eventService.createEvent(new Event(userId, EventType.FRIEND, Operation.ADD, friendId));
     }
 
     public void deleteFriend(Long userId, Long friendId) {
@@ -73,6 +82,7 @@ public class UserService {
 
         friendshipStorage.removeFriend(userId, friendId);
         log.debug("Пользователь {} удалил пользователя {} из списка друзей", userId, friendId);
+        eventService.createEvent(new Event(userId, EventType.FRIEND, Operation.REMOVE, friendId));
     }
 
     public List<User> getFriends(Long id) {
