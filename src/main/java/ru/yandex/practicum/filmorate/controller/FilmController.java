@@ -76,7 +76,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
-    public List<Film> getTopFilmsByGenreAndYear(@RequestParam(defaultValue = "10") int count, @RequestParam(required = false) Integer genreId, @RequestParam(required = false) String year) {
-        return filmService.getTopFilmsByGenreAndYear(count, genreId,year);
+    public List<Film> getTopFilmsByGenreAndYear(@RequestParam(defaultValue = "10") int count,@RequestParam(defaultValue = "0") Integer genreId, @RequestParam(required = false) String year) {
+        return filmService.getTopFilmsByGenreAndYear(count, genreId, year);
     }
 }
