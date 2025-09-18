@@ -230,14 +230,40 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getFilmsByDirectorOrTitleSortByLike(String query, String director, String title) {
+        List<Film> films= new ArrayList<>();
 
         if (!title.isEmpty() && !director.isEmpty()) {
-            return getFilmsByDirectorOrTitleSortByLike(query);
+            films = getFilmsByDirectorOrTitleSortByLike(query);
         }
         if (title.isEmpty()) {
-            return getFilmsByDirectorSortByLike(query);
+            films = getFilmsByDirectorSortByLike(query);
         }
-        return getFilmsByTitleSortByLike(query);
+        films = getFilmsByTitleSortByLike(query);
+
+        if (films.isEmpty()) return films;
+
+        Map<Long, Film> filmMap = new HashMap<>();
+        for (Film film : films) {
+            filmMap.put(film.getId(), film);
+        }
+
+        List<Long> filmsIds = new ArrayList<>(filmMap.keySet());
+
+        String findGenresForFilmQuery = "SELECT fg.film_id, g.id AS genre_id, g.genre_name " +
+                "FROM film_genres fg " +
+                "JOIN genres g ON fg.genre_id = g.id " +
+                "WHERE fg.film_id IN (" + String.join(",", Collections.nCopies(filmsIds.size(), "?")) + ")";
+
+        jdbcTemplate.query(findGenresForFilmQuery, filmsIds.toArray(), (rs) -> {
+            long filmId = rs.getLong("film_id");
+            Film film = filmMap.get(filmId);
+
+            if (film != null) {
+                Genre genre = new Genre(rs.getInt("genre_id"), rs.getString("genre_name"));
+                film.getGenres().add(genre);
+            }
+        });
+        return films;
     }
 
     private List<Film> getFilmsByDirectorOrTitleSortByLike(String query) {
