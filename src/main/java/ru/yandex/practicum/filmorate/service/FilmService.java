@@ -96,6 +96,10 @@ public class FilmService {
         return filmDbStorage.getCommonFilms(userId,friendId);
     }
 
+    public List<Film>  getTopFilmsByGenreAndYear(int id, Integer genreId, String year) {
+        return filmDbStorage.getTopFilmsByGenreOrYear(id, genreId, year);
+    }
+
     public Collection<Film> getAllFilms() {
         return filmStorage.getAllFilms();
     }
