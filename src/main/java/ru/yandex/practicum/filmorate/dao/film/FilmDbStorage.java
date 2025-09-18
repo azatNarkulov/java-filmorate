@@ -230,40 +230,15 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getFilmsByDirectorOrTitleSortByLike(String query, String director, String title) {
-        List<Film> films = new ArrayList<>();
 
         if (!title.isEmpty() && !director.isEmpty()) {
-            films = getFilmsByDirectorOrTitleSortByLike(query);
+            return getFilmsByDirectorOrTitleSortByLike(query);
         }
         if (title.isEmpty()) {
-            films = getFilmsByDirectorSortByLike(query);
+            return getFilmsByDirectorSortByLike(query);
         }
-        films = getFilmsByTitleSortByLike(query);
+        return getFilmsByTitleSortByLike(query);
 
-        if (films.isEmpty()) return films;
-
-        Map<Long, Film> filmMap = new HashMap<>();
-        for (Film film : films) {
-            filmMap.put(film.getId(), film);
-        }
-
-        List<Long> filmsIds = new ArrayList<>(filmMap.keySet());
-
-        String findGenresForFilmQuery = "SELECT fg.film_id, g.id AS genre_id, g.genre_name " +
-                "FROM film_genres fg " +
-                "JOIN genres g ON fg.genre_id = g.id " +
-                "WHERE fg.film_id IN (" + String.join(",", Collections.nCopies(filmsIds.size(), "?")) + ")";
-
-        jdbcTemplate.query(findGenresForFilmQuery, filmsIds.toArray(), (rs) -> {
-            long filmId = rs.getLong("film_id");
-            Film film = filmMap.get(filmId);
-
-            if (film != null) {
-                Genre genre = new Genre(rs.getInt("genre_id"), rs.getString("genre_name"));
-                film.getGenres().add(genre);
-            }
-        });
-        return films;
     }
 
     private List<Film> getFilmsByDirectorOrTitleSortByLike(String query) {
@@ -271,7 +246,9 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN film_directors fd ON fd.film_id = f.id LEFT JOIN directors d ON fd.director_id = d.id " +
                 "LEFT JOIN likes fl ON fl.film_id = f.id GROUP BY f.id " +
                 "HAVING LOWER(d.name) LIKE ? OR LOWER(f.name) LIKE ? ORDER BY COUNT(fl.user_id) DESC";
-        return jdbcTemplate.query(sql, mapper(), query, query);
+        List<Film> films = jdbcTemplate.query(sql, mapper(), query, query);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
     }
 
     private List<Film> getFilmsByDirectorSortByLike(String query) {
@@ -279,14 +256,18 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN film_directors fd ON fd.film_id = f.id LEFT JOIN directors d ON fd.director_id = d.id " +
                 "LEFT JOIN likes fl ON fl.film_id = f.id GROUP BY f.id " +
                 "HAVING LOWER(d.name) LIKE ? ORDER BY COUNT(fl.user_id) DESC";
-        return jdbcTemplate.query(sql, mapper(), query);
+        List<Film> films = jdbcTemplate.query(sql, mapper(), query);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
     }
 
     private List<Film> getFilmsByTitleSortByLike(String query) {
         String sql = "SELECT f.*, m.mpa_name FROM films f INNER JOIN mpa m ON m.id = f.mpa_id " +
                 "LEFT JOIN likes fl ON fl.film_id = f.id GROUP BY f.id " +
                 "HAVING LOWER(f.name) LIKE ? ORDER BY COUNT(fl.user_id) DESC";
-        return jdbcTemplate.query(sql, mapper(), query);
+        List<Film> films = jdbcTemplate.query(sql, mapper(), query);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
     }
 
     private RowMapper<Film> mapper() {
