@@ -18,6 +18,7 @@ import ru.yandex.practicum.filmorate.storage.film.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -116,6 +117,19 @@ public class FilmService {
         likeStorage.removeLike(filmId, userId);
         log.debug("Пользователь {} убрал лайк к фильму {}", userId, filmId);
         eventService.createEvent(new Event(userId, EventType.LIKE, Operation.REMOVE, filmId));
+    }
+
+    public List<Film> getFilmsByDirectorOrTitleSortByLike(String query, String by) {
+
+        AtomicReference<String> director = new AtomicReference<>("");
+        AtomicReference<String> title = new AtomicReference<>("");
+        Arrays.stream(by.split(",")).forEach(q -> {
+            if (q.trim().equals("director")) director.set("director");
+            if (q.trim().equals("title")) title.set("title");
+        });
+        StringBuilder queryBuilder = new StringBuilder("%");
+        queryBuilder.append(query.toLowerCase()).append("%");
+        return filmDbStorage.getFilmsByDirectorOrTitleSortByLike(queryBuilder.toString(), director.get(), title.get());
     }
 
     public List<Film> getPopularFilms(int count) {

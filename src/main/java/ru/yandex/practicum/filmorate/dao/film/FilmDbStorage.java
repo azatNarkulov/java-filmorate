@@ -229,6 +229,47 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    public List<Film> getFilmsByDirectorOrTitleSortByLike(String query, String director, String title) {
+
+        if (!title.isEmpty() && !director.isEmpty()) {
+            return getFilmsByDirectorOrTitleSortByLike(query);
+        }
+        if (title.isEmpty()) {
+            return getFilmsByDirectorSortByLike(query);
+        }
+        return getFilmsByTitleSortByLike(query);
+
+    }
+
+    private List<Film> getFilmsByDirectorOrTitleSortByLike(String query) {
+        String sql = "SELECT f.*, m.mpa_name FROM films f INNER JOIN mpa m ON m.id = f.mpa_id " +
+                "LEFT JOIN film_directors fd ON fd.film_id = f.id LEFT JOIN directors d ON fd.director_id = d.id " +
+                "LEFT JOIN likes fl ON fl.film_id = f.id GROUP BY f.id " +
+                "HAVING LOWER(d.name) LIKE ? OR LOWER(f.name) LIKE ? ORDER BY COUNT(fl.user_id) DESC";
+        List<Film> films = jdbcTemplate.query(sql, mapper(), query, query);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
+    }
+
+    private List<Film> getFilmsByDirectorSortByLike(String query) {
+        String sql = "SELECT f.*, m.mpa_name FROM films f INNER JOIN mpa m ON m.id = f.mpa_id " +
+                "LEFT JOIN film_directors fd ON fd.film_id = f.id LEFT JOIN directors d ON fd.director_id = d.id " +
+                "LEFT JOIN likes fl ON fl.film_id = f.id GROUP BY f.id " +
+                "HAVING LOWER(d.name) LIKE ? ORDER BY COUNT(fl.user_id) DESC";
+        List<Film> films = jdbcTemplate.query(sql, mapper(), query);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
+    }
+
+    private List<Film> getFilmsByTitleSortByLike(String query) {
+        String sql = "SELECT f.*, m.mpa_name FROM films f INNER JOIN mpa m ON m.id = f.mpa_id " +
+                "LEFT JOIN likes fl ON fl.film_id = f.id GROUP BY f.id " +
+                "HAVING LOWER(f.name) LIKE ? ORDER BY COUNT(fl.user_id) DESC";
+        List<Film> films = jdbcTemplate.query(sql, mapper(), query);
+        loadGenresAndDirectorsForFilms(films);
+        return films;
+    }
+
     private RowMapper<Film> mapper() {
         return (rs, rowNum) -> {
             Film film = new Film();
