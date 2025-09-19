@@ -74,22 +74,6 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    public List<Film> getTopFilmsByGenreOrYear(int limit, Integer genreId, String year) {
-        boolean hasYear = year != null;
-        boolean hasGenre = genreId != null && genreId > 0;
-
-        if (hasYear && hasGenre) {
-            return getTopFilmsByGenreAndYear(limit, genreId, year);
-        }
-        if (hasYear) {
-            return  getTopFilmsByYear(limit, year);
-        }
-        if (hasGenre) {
-            return  getTopFilmsByGenre(limit, genreId);
-        }
-        return getTopFilms(limit);
-    }
-
     public List<Film> getTopFilmsByGenreAndYear(int limit, Integer genreId, String year) {
         String sql;
         sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id," +

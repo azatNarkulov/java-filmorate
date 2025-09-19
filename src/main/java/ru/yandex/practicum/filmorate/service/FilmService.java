@@ -87,8 +87,20 @@ public class FilmService {
         return filmStorage.updateFilm(newFilm);
     }
 
-    public List<Film>  getTopFilmsByGenreOrYear(int id, Integer genreId, String year) {
-        return filmDbStorage.getTopFilmsByGenreOrYear(id, genreId, year);
+    public List<Film> getTopFilmsByGenreOrYear(int limit, Integer genreId, String year) {
+        boolean hasYear = year != null;
+        boolean hasGenre = genreId != null && genreId > 0;
+
+        if (hasYear && hasGenre) {
+            return filmDbStorage.getTopFilmsByGenreAndYear(limit, genreId, year);
+        }
+        if (hasYear) {
+            return  filmDbStorage.getTopFilmsByYear(limit, year);
+        }
+        if (hasGenre) {
+            return  filmDbStorage.getTopFilmsByGenre(limit, genreId);
+        }
+        return filmDbStorage.getTopFilms(limit);
     }
 
     public void deleteFilm(Long id) {
