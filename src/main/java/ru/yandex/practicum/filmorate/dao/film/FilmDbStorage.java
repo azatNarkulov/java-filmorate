@@ -229,15 +229,15 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
-    public List<Film> getTopFilmsByGenreOrYear(int limit, String genreId, String year) {
-        if (!genreId.isEmpty() && !year.isEmpty()) {
-            return getTopFilmsByGenreAndYear(limit, Integer.parseInt(genreId), year);
+    public List<Film> getTopFilmsByGenreOrYear(int limit, Integer genreId, String year) {
+        if ((genreId > 0) && !year.isEmpty()) {
+            return getTopFilmsByGenreAndYear(limit, genreId, year);
         }
-        if (genreId.isEmpty() && !year.isEmpty()) {
+        if ((genreId == 0) && !year.isEmpty()) {
             return  getTopFilmsByYear(limit, year);
         }
-        if (!genreId.isEmpty() && year.isEmpty()) {
-            return  getTopFilmsByGenre(limit, Integer.parseInt(genreId));
+        if ((genreId > 0) && year.isEmpty()) {
+            return  getTopFilmsByGenre(limit, genreId);
         }
         return getTopFilms(limit);
     }
