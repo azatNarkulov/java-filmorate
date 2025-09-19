@@ -87,6 +87,10 @@ public class FilmService {
         return filmStorage.updateFilm(newFilm);
     }
 
+    public List<Film>  getTopFilmsByGenreOrYear(int id, Integer genreId, String year) {
+        return filmDbStorage.getTopFilmsByGenreOrYear(id, genreId, year);
+    }
+
     public void deleteFilm(Long id) {
         Film film = getFilmById(id);
         log.debug("Удаляем фильм: {}", film);

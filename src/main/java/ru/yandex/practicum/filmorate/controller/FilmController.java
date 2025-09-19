@@ -84,4 +84,10 @@ public class FilmController {
 
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
+
+    @GetMapping("/popular")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> getTopFilmsByGenreOrYear(@RequestParam(defaultValue = "10") int count, @RequestParam(defaultValue = "0") Integer genreId, @RequestParam(required = false) String year) {
+        return filmService.getTopFilmsByGenreOrYear(count, genreId, year);
+    }
 }
