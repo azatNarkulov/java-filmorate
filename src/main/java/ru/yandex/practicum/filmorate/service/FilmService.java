@@ -96,9 +96,25 @@ public class FilmService {
         return filmDbStorage.getCommonFilms(userId,friendId);
     }
 
-    public List<Film>  getTopFilmsByGenreAndYear(int id, Integer genreId, String year) {
+    /*public List<Film>  getTopFilmsByGenreAndYear(int id, Integer genreId, String year) {
         return filmDbStorage.getTopFilmsByGenreOrYear(id, genreId, year);
     }
+
+     */
+
+    public List<Film>  getTopFilmsByGenreAndYear(int count, Integer genreId, String year) {
+        if ((genreId > 0) && !year.isEmpty()) {
+            return getTopFilmsByGenreAndYear(count, genreId, year);
+        }
+        if ((genreId == 0) && !year.isEmpty()) {
+            return  filmDbStorage.getTopFilmsByYear(count, year);
+        }
+        if ((genreId > 0) && year.isEmpty()) {
+            return  filmDbStorage.getTopFilmsByGenre(count, genreId);
+        }
+        return filmDbStorage.getTopFilms(count);
+    }
+
 
     public Collection<Film> getAllFilms() {
         return filmStorage.getAllFilms();
