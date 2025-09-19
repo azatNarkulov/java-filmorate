@@ -8,6 +8,8 @@ DROP TABLE IF EXISTS genres CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS review_likes CASCADE;
 DROP TABLE IF EXISTS events CASCADE;
+DROP TABLE IF EXISTS directors CASCADE;
+DROP TABLE IF EXISTS film_directors CASCADE;
 
 CREATE TABLE IF NOT EXISTS mpa(
     id       INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,7 +23,7 @@ CREATE TABLE IF NOT EXISTS films(
     release_date DATE NOT NULL,
     duration     INT NOT NULL,
     mpa_id       INT,
-    FOREIGN KEY (mpa_id) REFERENCES mpa(id)
+    FOREIGN KEY (mpa_id) REFERENCES mpa(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS users(
@@ -89,7 +91,7 @@ CREATE TABLE IF NOT EXISTS events(
     event_type      VARCHAR(10) NOT NULL CHECK (event_type IN ('LIKE', 'REVIEW', 'FRIEND')),
     operation       VARCHAR(10) NOT NULL CHECK (operation IN('REMOVE', 'ADD', 'UPDATE')),
     entity_id       BIGINT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS directors (

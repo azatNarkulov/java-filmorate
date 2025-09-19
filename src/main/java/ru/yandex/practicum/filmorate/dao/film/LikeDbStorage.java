@@ -14,8 +14,13 @@ public class LikeDbStorage implements LikeStorage {
 
     @Override
     public void addLike(Long filmId, Long userId) {
-        String addLikeQuery = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
-        jdbcTemplate.update(addLikeQuery, filmId, userId);
+        String checkSql = "SELECT COUNT(*) FROM likes WHERE film_id = ? AND user_id = ?";
+        Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, filmId, userId);
+
+        if (count == 0) {
+            String addLikeQuery = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
+            jdbcTemplate.update(addLikeQuery, filmId, userId);
+        }
     }
 
     @Override

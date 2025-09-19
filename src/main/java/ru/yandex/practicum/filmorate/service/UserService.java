@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.user.EventType;
 import ru.yandex.practicum.filmorate.model.user.Operation;
 import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.storage.film.LikeStorage;
-import ru.yandex.practicum.filmorate.storage.user.EventStorage;
 import ru.yandex.practicum.filmorate.storage.user.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -30,8 +29,7 @@ public class UserService {
                        FriendshipStorage friendshipStorage,
                        LikeStorage likeStorage,
                        FilmService filmService,
-                       EventService eventService,
-                       EventStorage eventStorage) {
+                       EventService eventService) {
         this.userStorage = userStorage;
         this.friendshipStorage = friendshipStorage;
         this.likeStorage = likeStorage;
@@ -111,13 +109,13 @@ public class UserService {
         similarUserLikes.removeAll(userLikes);
 
         return similarUserLikes.stream()
-                .map(filmId -> filmService.getFilmById(filmId))
+                .map(filmService::getFilmById)
                 .collect(Collectors.toList());
 
     }
 
     private Long findMostSimilarUser(Long userId) {
-        Set<Long> userLikes = likeStorage.getLikesByUserId(userId);
+//        Set<Long> userLikes = likeStorage.getLikesByUserId(userId);
         Map<Long, Long> commonLikesCountMap = likeStorage.findUsersWithCommonLikes(userId);
 
         return commonLikesCountMap.entrySet().stream()

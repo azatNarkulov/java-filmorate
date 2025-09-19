@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Genre;
@@ -30,7 +29,6 @@ public class FilmService {
     private final LikeStorage likeStorage;
     private final EventService eventService;
     private final DirectorService directorService;
-    private final FilmDbStorage filmDbStorage;
 
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                        @Qualifier("userDbStorage") UserStorage userStorage,
@@ -38,8 +36,7 @@ public class FilmService {
                        MpaStorage mpaStorage,
                        LikeStorage likeStorage,
                        EventService eventService,
-                       DirectorService directorService,
-                       FilmDbStorage filmDbStorage) {
+                       DirectorService directorService) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.genreStorage = genreStorage;
@@ -47,7 +44,6 @@ public class FilmService {
         this.likeStorage = likeStorage;
         this.eventService = eventService;
         this.directorService = directorService;
-        this.filmDbStorage = filmDbStorage;
     }
 
     public Film getFilmById(Long id) {
@@ -92,15 +88,15 @@ public class FilmService {
         boolean hasGenre = genreId != null && genreId > 0;
 
         if (hasYear && hasGenre) {
-            return filmDbStorage.getTopFilmsByGenreAndYear(limit, genreId, year);
+            return filmStorage.getTopFilmsByGenreAndYear(limit, genreId, year);
         }
         if (hasYear) {
-            return  filmDbStorage.getTopFilmsByYear(limit, year);
+            return filmStorage.getTopFilmsByYear(limit, year);
         }
         if (hasGenre) {
-            return  filmDbStorage.getTopFilmsByGenre(limit, genreId);
+            return filmStorage.getTopFilmsByGenre(limit, genreId);
         }
-        return filmDbStorage.getTopFilms(limit);
+        return filmStorage.getTopFilms(limit);
     }
 
     public void deleteFilm(Long id) {
@@ -110,7 +106,7 @@ public class FilmService {
     }
 
     public List<Film> getCommonFilms(Long userId, Long friendId) {
-        return filmDbStorage.getCommonFilms(userId,friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 
     public Collection<Film> getAllFilms() {
@@ -143,16 +139,12 @@ public class FilmService {
             if (q.trim().equals("director")) director.set("director");
             if (q.trim().equals("title")) title.set("title");
         });
-        StringBuilder queryBuilder = new StringBuilder("%");
-        queryBuilder.append(query.toLowerCase()).append("%");
-        return filmDbStorage.getFilmsByDirectorOrTitleSortByLike(queryBuilder.toString(), director.get(), title.get());
+        return filmStorage.getFilmsByDirectorOrTitleSortByLike("%" + query.toLowerCase() + "%", director.get(), title.get());
     }
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getAllFilms().stream()
-                .peek(film -> {
-                    film.setLikesId(new HashSet<>(likeStorage.getLikesByFilmId(film.getId())));
-                })
+                .peek(film -> film.setLikesId(new HashSet<>(likeStorage.getLikesByFilmId(film.getId()))))
                 .sorted(Comparator.comparingInt((Film film) -> film.getLikesId().size()).reversed())
                 .limit(count)
                 .toList();

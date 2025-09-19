@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.film.Film;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -48,6 +49,36 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        throw new UnsupportedOperationException("Метод не реализован для in-memory хранилища");
+    }
+
+    @Override
+    public List<Film> getTopFilmsByGenreAndYear(int limit, Integer genreId, String year) {
+        throw new UnsupportedOperationException("Метод не реализован для in-memory хранилища");
+    }
+
+    @Override
+    public List<Film> getTopFilmsByGenre(int limit, Integer genreId) {
+        throw new UnsupportedOperationException("Метод не реализован для in-memory хранилища");
+    }
+
+    @Override
+    public List<Film> getTopFilms(int limit) {
+        throw new UnsupportedOperationException("Метод не реализован для in-memory хранилища");
+    }
+
+    @Override
+    public List<Film> getTopFilmsByYear(int limit, String year) {
+        throw new UnsupportedOperationException("Метод не реализован для in-memory хранилища");
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        throw new UnsupportedOperationException("Метод не реализован для in-memory хранилища");
+    }
+
+    @Override
+    public List<Film> getFilmsByDirectorOrTitleSortByLike(String query, String director, String title) {
         throw new UnsupportedOperationException("Метод не реализован для in-memory хранилища");
     }
 }

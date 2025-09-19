@@ -29,7 +29,7 @@ public class EventDbStorage implements EventStorage {
     });
 
     @Override
-    public Event create(Event event) {
+    public void create(Event event) {
         String createQuery = "INSERT INTO events (timestamp, user_id, event_type, operation, entity_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
@@ -47,7 +47,6 @@ public class EventDbStorage implements EventStorage {
         if (id != null) {
             event.setEventId(id);
         }
-        return event;
     }
 
     @Override
