@@ -16,13 +16,13 @@ import java.util.Set;
 public class FriendshipDbStorage implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<User> mapper = ((rs, rowNum) -> {
-       User user = new User();
-       user.setId(rs.getLong("id"));
-       user.setEmail(rs.getString("email"));
-       user.setLogin(rs.getString("login"));
-       user.setName(rs.getString("name"));
-       user.setBirthday(rs.getDate("birthday").toLocalDate());
-       return user;
+        User user = new User();
+        user.setId(rs.getLong("id"));
+        user.setEmail(rs.getString("email"));
+        user.setLogin(rs.getString("login"));
+        user.setName(rs.getString("name"));
+        user.setBirthday(rs.getDate("birthday").toLocalDate());
+        return user;
     });
 
     @Override

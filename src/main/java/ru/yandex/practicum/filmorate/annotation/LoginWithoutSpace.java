@@ -16,5 +16,6 @@ public @interface LoginWithoutSpace {
     String message() default "Логин не может содержать пробелы";
 
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

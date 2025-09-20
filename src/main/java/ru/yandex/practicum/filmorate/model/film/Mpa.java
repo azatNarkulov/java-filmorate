@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.model.film;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
 @AllArgsConstructor
+@Data
 public class Mpa {
     private final int id;
     private final String name;

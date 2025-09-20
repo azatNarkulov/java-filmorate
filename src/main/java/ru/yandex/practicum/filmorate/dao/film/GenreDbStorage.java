@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.film.Genre;
 import ru.yandex.practicum.filmorate.storage.film.GenreStorage;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
